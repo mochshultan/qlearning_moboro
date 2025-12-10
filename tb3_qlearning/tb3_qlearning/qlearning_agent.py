@@ -28,7 +28,8 @@ class QLearningAgent(Node):
         super().__init__('qlearning_agent')
 
         self.stage = int(stage_num)
-        self.train_mode = True
+        self.train_mode = False # False for Testing mode
+        
         self.state_size = 8  # 2 goal + 6 lidar sensors
         self.action_size = 5
         self.max_training_episodes = int(max_training_episodes)
@@ -44,11 +45,11 @@ class QLearningAgent(Node):
         self.q_table = {}
         self.distance_bins = 3    # goal distance bins: >3.0, 3.-1.5, 1.5-0
         self.angle_bins = 10      # goal angle bins: 5 depan + 5 belakang
-        self.obstacle_bins = 2    # obstacle distance bins (close/far, threshold 0.25) for 6 sensors
+        self.obstacle_bins = 2    # obstacle distance bins (close/far, threshold 0.5) for 6 sensors
         # State space: 3 × 10 × 2^6 = 1920 states
 
-        self.load_model = False
-        self.load_episode = 0
+        self.load_model = True
+        self.load_episode = 3000
         self.load_from_stage = 2  # Load Q-table dari stage ini
 
         self.model_dir_path = os.path.join(
@@ -217,7 +218,7 @@ class QLearningAgent(Node):
         # 6 sensor lidar depan (270°-90°), sudah difilter di environment
         scan_ranges = state[2:]  # 6 sensor readings
         obs_bins = tuple(
-            1 if scan_ranges[i] > 0.25 else 0  # 1=jauh, 0=dekat (threshold 0.25)
+            1 if scan_ranges[i] > 0.5 else 0  # 1=jauh, 0=dekat (threshold 0.5)
             for i in range(6)
         )
         

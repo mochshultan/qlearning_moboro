@@ -260,7 +260,7 @@ class RLEnvironment(Node):
             self.local_step = 0
             self.call_task_succeed()
 
-        elif self.min_obstacle_distance < 0.15:
+        elif self.min_obstacle_distance < 0.10:  # collision threshold
             self.get_logger().info('Collision happened')
             self.fail = True
             self.done = True
