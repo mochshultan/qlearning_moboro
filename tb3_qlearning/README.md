@@ -115,8 +115,8 @@ State di-diskritisasi untuk Q-table:
 #### 3. **LiDAR Obstacles** (6 sensors × 2 bins)
 - **6 sensor depan**: 270° - 90° (filtered dari 12 samples total)
 - **2 bins per sensor**: 
-  - `0`: Dekat (≤ 0.25m)
-  - `1`: Jauh (> 0.25m)
+  - `0`: Dekat (≤ 0.5m)
+  - `1`: Jauh (> 0.5m)
 
 ### Total State Space
 ```
@@ -163,7 +163,7 @@ Reward per step terdiri dari 2 komponen:
 ```python
 Rd = 100.0 × (d_old - d_new)
 ```
-- **Range:** -∞ hingga +∞ (praktis: -10 hingga +10)
+- **Range:** -∞ hingga +∞ (praktis: -2 hingga +2)
 - **Positif:** Robot mendekat ke target
 - **Negatif:** Robot menjauh dari target
 - **Zero:** Robot tidak bergerak (stuck)
@@ -183,7 +183,7 @@ Rθ = 0.5 × (1.0 - 2.0 × |e_theta_normalized| / π)
 ```python
 R_total = Rd + Rθ
 ```
-**Range:** Sekitar -10.5 hingga +10.5 per step
+**Range:** Sekitar -2.5 hingga +2.5 per step
 
 ---
 
@@ -388,23 +388,24 @@ Step: 20, Rd: -1.23, Rtheta: 0.12, R_step: -1.11, MinObs: 0.876
 export TURTLEBOT3_MODEL=burger
 ros2 launch turtlebot3_gazebo turtlebot3_stage2.launch.py
 
-# Terminal 2: Start training
+# Terminal 2: Launch Gazebo target summoner
+ros2 run turtlebot3_dqn dqn_gazebo 2
+
+# Terminal 3: Start training
 ros2 run tb3_qlearning qlearning_agent 2 1000
 
-# Terminal 3: (Optional) Live plot
+# Terminal 4: (Optional) Live plot
 ros2 run tb3_qlearning plot_rewards
+
+# Terminal 5: (Optional) Action plot
+ros2 run turtlebot3_dqn action_graph
 ```
 
 ### Testing
 ```bash
 # Run test with default settings
+# in qlearning_agent.py set mode Train to 'False'
 ros2 run tb3_qlearning qlearning_test 2 1000
-
-# With custom model
-ros2 run tb3_qlearning qlearning_test 2 1000 /path/to/qtable.json
-
-# With custom targets
-ros2 run tb3_qlearning qlearning_test 2 1000 None /path/to/targets.txt
 ```
 
 ---
